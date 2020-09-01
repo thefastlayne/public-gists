@@ -1,7 +1,7 @@
 #!/bin/bash
 #  @title LEMP Installer
 #  @author Kamaran Layne <github.com/KamaranL>
-#  @system
+#  @system Debian 8,9 | Ubuntu 16,18,20 | CentOS 7,8 | RedHat Enterprise Linux 7,8
 #  @description This script will install Nginx 1.x.x, MariaDB 10.5.x, Php 7.4.x and PhpMyAdmin 5.0.x
 
 __construct ()
@@ -13,17 +13,17 @@ __construct ()
   DIST=$(awk -F= '/^ID=/{print $2}' /etc/os-release | sed 's|"||g')
   VER=$(awk -F= '/^VERSION_ID=/{print $2}' /etc/os-release | sed 's|"||g' | sed -e "s|[.].*||")
   if [ "$DIST" = "debian" -o "$DIST" = "ubuntu" ]; then
-    WEBROOT="/var/www/"
-    FASTCGI_PASS="unix:/run/php/php7.4-fpm.sock"
-    PMAROOT="/usr/share/"
+    WEB_ROOT="/var/www/"
+    PHP_SOCKET="unix:/run/php/php7.4-fpm.sock"
+    PMA_ROOT="/usr/share/"
   elif [ "$DIST" = "centos" -o "$DIST" = "rhel" ]; then
-    WEBROOT="/usr/share/nginx/"
-    FASTCGI_PASS="unix:/run/php-fpm/www.sock"
-    PMAROOT="$WEBROOT"
+    WEB_ROOT="/usr/share/nginx/"
+    PHP_SOCKET="unix:/run/php-fpm/www.sock"
+    PMA_ROOT="$WEB_ROOT"
   fi
-  WEB_GH="https://github.com/KamaranL/"
-  WEB_TFL="https://www.thefastlayne.net/"
-  DB_MGR="phpmyadmin"
+  MY_GITHUB="https://github.com/KamaranL/"
+  THEFASTLAYNE_WEB="https://www.thefastlayne.net/"
+  THEFASTLAYNE_GITHUB="https://github.com/TheFastLayne/"
 }
 
 installPrereqs ()
@@ -43,7 +43,7 @@ installNginx ()
 {
   echo -e "${YELLOW}Installing Nginx...${NC}\n"
   if [ "$DIST" = "debian" -o "$DIST" = "ubuntu" ]; then
-  echo -e "\n\n#LEMP Sources:\n" >> /etc/apt/sources.list
+    echo -e "\n\n#LEMP Sources:\n" >> /etc/apt/sources.list
     wget -P /tmp http://nginx.org/keys/nginx_signing.key
     apt-key add /tmp/nginx_signing.key
     add-apt-repository "deb http://nginx.org/packages/mainline/$DIST/ $CODE nginx"
@@ -60,57 +60,15 @@ installNginx ()
     yum install -y nginx
     rm -rf /etc/nginx/conf.d/*.conf
   fi
-  systemctl start nginx
-  systemctl enable nginx
-  mkdir /etc/nginx/global "$WEBROOT"html
-}
+  mkdir /etc/nginx/global "$WEB_ROOT"html
 
-setupDemoPage ()
-{
-  wget -P "$WEBROOT"html https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css
-
-  # ../../../html/index.php
-  echo -e '<!DOCTYPE html>
-<html>
-<head>
-  <title>
-    Welcome!
-  </title>
-  <link rel="stylesheet" href="bootstrap.min.css">
-</head>
-<body class="p-2">
-  <div class="p-4 container">
-    <div class="card">
-      <h1 class="card-header text-center">Congrats!</h1>
-      <div class="text-center p-2">
-        If you are reading this, you have successfully launched your webserver.
-      </div>
-      <div class="p-2">
-        You can get started by:
-        <ul>
-          <li>replacing this file (<code>index.php</code>) at <code><?= dirname(__FILE__); ?></code></li>
-          <li>logging into <a href="/phpmyadmin" target="_blank">PhpMyAdmin</a> and creating your first database</li>
-          <li>visiting <a href="'$WEB_GH'" target="_blank">my GitHub</a> and starring my code if it helped you out in any way</li>
-        </ul>
-      </div>
-      <div class="card-footer">
-        <a href="'$WEB_TFL'" target="_blank">The Fast Layne</a> / <a href="/phpmyadmin" target="_blank">PhpMyAdmin</a>
-      </div>
-    </div>
-  </div>
-</body>
-</html>' > "$WEBROOT"html/index.php
-}
-
-configureNginx ()
-{
   # /etc/nginx/conf.d/default.conf
   echo -e '# default virtual host
     server {
       listen 80;
       server_name _;
       index index.php;
-      root '$WEBROOT'html;
+      root '$WEB_ROOT'html;
       location / {
         try_files $uri $uri/ =404;
       }
@@ -152,7 +110,7 @@ configureNginx ()
         return 301 https://$host$request_uri;
       }
       index index.php;
-      root '$WEBROOT'html;
+      root '$WEB_ROOT'html;
       include global/gzip.conf;
       include global/ssl.conf;
       ssl_certificate /etc/ssl/certs/server-cert.pem;
@@ -235,7 +193,7 @@ if (!-f $document_root$fastcgi_script_name) {
 include fastcgi_params;
 fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
 fastcgi_index index.php;
-fastcgi_pass '$FASTCGI_PASS';
+fastcgi_pass '$PHP_SOCKET';
 fastcgi_intercept_errors on;
 proxy_buffer_size 32k;
 proxy_buffers 30 32k;
@@ -268,6 +226,42 @@ gzip_types   text/plain
              application/x-httpd-php;
 gzip_disable "MSIE [1-6]\.";
 gzip_buffers 16 8k;' > /etc/nginx/global/gzip.conf
+
+  wget -P "$WEB_ROOT"html https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css
+
+  # ../../../html/index.php
+  echo -e '<!DOCTYPE html>
+<html>
+<head>
+  <title>
+    Welcome!
+  </title>
+  <link rel="stylesheet" href="bootstrap.min.css">
+</head>
+<body class="p-2">
+  <div class="p-4 container">
+    <div class="card">
+      <h1 class="card-header text-center">Congrats!</h1>
+      <div class="text-center p-2">
+        If you are reading this, you have successfully launched your webserver.
+      </div>
+      <div class="p-2">
+        You can get started by:
+        <ul>
+          <li>replacing this file (<code>index.php</code>) at <code><?= dirname(__FILE__); ?></code></li>
+          <li>logging into <a href="/phpmyadmin" target="_blank">phpMyAdmin</a> and creating your first database</li>
+          <li>visiting <a href="'$THEFASTLAYNE_GITHUB'" target="_blank">our GitHub</a> and starring the "public-gists" repo if it helped you out in any way</li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <a href="'$THEFASTLAYNE_WEB'" target="_blank" title="Website for The Fast Layne>The Fast Layne (Web)</a> /
+        <a href="'$THEFASTLAYNE_GITHUB'" target="_blank" title="GitHub for The Fast Layne">The FastLayne (GitHub)</a> /
+        <a href="'$MY_GITHUB'" target="_blank" title="GitHub for Kamaran Layne">KamaranL (GitHub)</a>
+      </div>
+    </div>
+  </div>
+</body>
+</html>' > "$WEB_ROOT"html/index.php
   if [ "$DIST" = "centos" -o "$DIST" = "rhel" ]; then
     if [ $VER = 8 ]; then
       sed -i -e "/include \/etc\/nginx\/conf.d\/\*.conf;/,+100d" /etc/nginx/nginx.conf
@@ -275,6 +269,8 @@ gzip_buffers 16 8k;' > /etc/nginx/global/gzip.conf
       echo -e "}"  | sed -e "s|^[[:space:]]*||" >> /etc/nginx/nginx.conf
     fi
   fi
+  systemctl start nginx
+  systemctl enable nginx
   echo -e "${GREEN}Nginx Installed!${NC}\n"
 }
 
@@ -366,43 +362,43 @@ installPhp ()
 
 installPhpmyadmin ()
 {
-  echo -e "${YELLOW}Installing PhpMyAdmin...${NC}\n"
+  echo -e "${YELLOW}Installing phpMyAdmin...${NC}\n"
   wget -P /tmp https://files.phpmyadmin.net/phpMyAdmin/5.0.2/phpMyAdmin-5.0.2-english.tar.gz
   tar xzf /tmp/phpMyAdmin-5.0.2-english.tar.gz -C /usr/share
-  mv /usr/share/phpMyAdmin-5.0.2-english "$PMAROOT"phpmyadmin
-  cp "$PMAROOT"phpmyadmin/config.sample.inc.php "$PMAROOT"phpmyadmin/config.inc.php
+  mv /usr/share/phpMyAdmin-5.0.2-english "$PMA_ROOT"phpmyadmin
+  cp "$PMA_ROOT"phpmyadmin/config.sample.inc.php "$PMA_ROOT"phpmyadmin/config.inc.php
   mkdir /etc/nginx/aliases
 
   # /etc/nginx/aliases/phpmyadmin.conf
   echo -e '# Alias /phpmyadmin
     location /phpmyadmin {
       index index.php index.html index.htm;
-      root '$PMAROOT';
+      root '$PMA_ROOT';
       location ~ ^/phpmyadmin/(.+\.php)$ {
         try_files $uri =404;
-        root '$PMAROOT';
+        root '$PMA_ROOT';
         include global/fastcgi_php.conf;
       }
       location ~* ^/phpmyadmin/(.+\.(jpg|jpeg|gif|css|png|js|ico|html|xml|txt))$ {
-        root '$PMAROOT';
+        root '$PMA_ROOT';
       }
     }
     location /phpMyAdmin {
       rewrite ^/* /phpmyadmin last;
     }' > /etc/nginx/aliases/phpmyadmin.conf
-  sed -i "s|define('CONFIG_DIR', '');|define('CONFIG_DIR', './');|g" "$PMAROOT"phpmyadmin/libraries/vendor_config.php
+  sed -i "s|define('CONFIG_DIR', '');|define('CONFIG_DIR', './');|g" "$PMA_ROOT"phpmyadmin/libraries/vendor_config.php
   if [ "$DIST" = "debian" -o "$DIST" = "ubuntu" ]; then
-    mkdir "$PMAROOT"phpmyadmin/libraries/tmp
+    mkdir "$PMA_ROOT"phpmyadmin/libraries/tmp
   elif [ "$DIST" = "centos" -o "$DIST" = "rhel" ]; then
-    sed -i "s|define('TEMP_DIR', ROOT_PATH . 'tmp/');|define('TEMP_DIR', '/tmp/');|g" "$PMAROOT"phpmyadmin/libraries/vendor_config.php
+    sed -i "s|define('TEMP_DIR', ROOT_PATH . 'tmp/');|define('TEMP_DIR', '/tmp/');|g" "$PMA_ROOT"phpmyadmin/libraries/vendor_config.php
   fi
   BFS=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
-  sed -i "s|cfg\['blowfish_secret'\] = '';|cfg\['blowfish_secret'\] = '$BFS';|g" "$PMAROOT"phpmyadmin/config.inc.php
+  sed -i "s|cfg\['blowfish_secret'\] = '';|cfg\['blowfish_secret'\] = '$BFS';|g" "$PMA_ROOT"phpmyadmin/config.inc.php
   PMA_PASS=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1)
-  PMA="CREATE USER 'phpmyadmin'@'localhost' IDENTIFIED BY '$PMA_PASS'; GRANT USAGE ON *.* TO 'phpmyadmin'@'localhost' REQUIRE NONE WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0; CREATE DATABASE IF NOT EXISTS \`phpmyadmin\`; GRANT ALL PRIVILEGES ON \`phpmyadmin\`.* TO 'phpmyadmin'@'localhost'; FLUSH PRIVILEGES;"
-  mysql -e "$PMA"
-  mysql -u root -D phpmyadmin < "$PMAROOT"phpmyadmin/sql/create_tables.sql
-  echo -e "${GREEN}PhpMyAdmin Installed!\n"
+  PMA_QUERY="CREATE USER 'phpmyadmin'@'localhost' IDENTIFIED BY '$PMA_PASS'; GRANT USAGE ON *.* TO 'phpmyadmin'@'localhost' REQUIRE NONE WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0; CREATE DATABASE IF NOT EXISTS \`phpmyadmin\`; GRANT ALL PRIVILEGES ON \`phpmyadmin\`.* TO 'phpmyadmin'@'localhost'; FLUSH PRIVILEGES;"
+  mysql -e "$PMA_QUERY"
+  mysql -u root -D phpmyadmin < "$PMA_ROOT"phpmyadmin/sql/create_tables.sql
+  echo -e "${GREEN}phpMyAdmin Installed!\n"
 }
 
 checkForUpdates ()
@@ -419,11 +415,11 @@ repairPermissions ()
 {
   echo -e "${GREEN}Reparing permissions...\n"
   if [ "$DIST" = "debian" -o "$DIST" = "ubuntu" ]; then
-    chown -R www-data:www-data "$WEBROOT" "$PMAROOT"phpmyadmin
+    chown -R www-data:www-data "$WEB_ROOT" "$PMA_ROOT"phpmyadmin
   elif [ "$DIST" = "centos" -o "$DIST" = "rhel" ]; then
-    chown -R nginx:nginx "$WEBROOT" "$PMAROOT"phpmyadmin /etc/nginx /var/lib/php
+    chown -R nginx:nginx "$WEB_ROOT" "$PMA_ROOT"phpmyadmin /etc/nginx /var/lib/php
   fi
-  chmod -R 0775 "$WEBROOT" "$PMAROOT"phpmyadmin /etc/nginx
+  chmod -R 0775 "$WEB_ROOT" "$PMA_ROOT"phpmyadmin /etc/nginx
 }
 
 configureSeLinux ()
@@ -463,8 +459,6 @@ main ()
     __construct
     installPrereqs
     installNginx
-    setupDemoPage
-    configureNginx
     installMariaDb
     installPhp
     installPhpmyadmin

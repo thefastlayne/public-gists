@@ -1,29 +1,8 @@
 #!/bin/bash
-
-##############
-#   STACKS   #
-##############
-#
-#
-installLEMPStack ()
-{
-
-}
-
-installLEPPStack ()
-{
-
-}
-
-installLEPDStack ()
-{
-
-}
-
-installLEMDStack ()
-{
-
-}
+#  @title Master-Dev Installer
+#  @author Kamaran Layne <github.com/KamaranL>
+#  @system Debian 8,9 | Ubuntu 16,18,20 | CentOS 7,8 | RedHat Enterprise Linux 7,8
+#  @description Select what components you want to install and it installs your dev environment for you
 
 ##############
 #  WHIPTAIL  #
@@ -54,14 +33,6 @@ selectCustom ()
   while read COMPONENT; do
     case $COMPONENT in
       "") install ;;
-      "") install ;;
-      "") install ;;
-      "") install ;;
-      "") install ;;
-      "") install ;;
-      "") install ;;
-      "") install ;;
-      "") install ;;
       # "") install ;;
     esac
   done < COMPONENTS
@@ -79,16 +50,11 @@ selectStack ()
       3>&1 1>&2 2>&3 \
   )
   case $STACK in
-    "LEMP") installLEMPStack
-      ;;
-    "LEPP") installLEPPStack
-      ;;
-    "LEPD") installLEPDStack
-      ;;
-    "LEMD") installLEMDStack
-      ;;
-    "Custom") selectCustom
-      ;;
+    "LEMP") curl -s https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/lemp.sh | bash ;;
+    "LEPP") curl -s https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/lemp.sh | bash ;;
+    "LEPD") curl -s https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/lemp.sh | bash ;;
+    "LEMD") curl -s https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/lemp.sh | bash ;;
+    "Custom") curl -s https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/lemp.sh | bash ;; ;;
   esac
 }
 
