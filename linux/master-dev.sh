@@ -54,7 +54,7 @@ selectStack ()
     "LEPP") curl -s https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/lemp.sh | bash ;;
     "LEPD") curl -s https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/lemp.sh | bash ;;
     "LEMD") curl -s https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/lemp.sh | bash ;;
-    "Custom") curl -s https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/lemp.sh | bash ;; ;;
+    "Custom") curl -s https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/lemp.sh | bash ;;
   esac
 }
 
