@@ -259,7 +259,7 @@ gzip_buffers 16 8k;' > /etc/nginx/global/gzip.conf
         </ul>
       </div>
       <div class="card-footer">
-        <a href="'$THEFASTLAYNE_WEB'" target="_blank" title="Website for The Fast Layne>The Fast Layne (Web)</a> /
+        <a href="'$THEFASTLAYNE_WEB'" target="_blank" title="Website for The Fast Layne">The Fast Layne (Web)</a> /
         <a href="'$THEFASTLAYNE_GITHUB'" target="_blank" title="GitHub for The Fast Layne">The FastLayne (GitHub)</a> /
         <a href="'$MY_GITHUB'" target="_blank" title="GitHub for Kamaran Layne">KamaranL (GitHub)</a>
       </div>
@@ -302,7 +302,10 @@ installPostgreSql ()
     systemctl start postgresql-12
     systemctl enable postgresql-12
   fi
-  PG_PASS=$(whiptail --passwordbox "Please set a password for user 'postgres':" 8 78 --title "PostgreSQL Postgres Password" 3>&1 1>&2 2>&3)
+  PG_PASS=$(
+    whiptail --passwordbox "Please set a password for user 'postgres': " 8 46 --title "PostgreSQL Postgres Password" --nocancel \
+    3>&1 1>&2 2>&3 \
+  )
   sudo -u postgres psql -U postgres -d postgres -c "ALTER USER POSTGRES WITH PASSWORD '$PG_PASS';"
   echo -e "${GREEN}PostgreSQL Installed!${NC}\n"
 }

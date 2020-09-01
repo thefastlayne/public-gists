@@ -254,7 +254,7 @@ gzip_buffers 16 8k;' > /etc/nginx/global/gzip.conf
         </ul>
       </div>
       <div class="card-footer">
-        <a href="'$THEFASTLAYNE_WEB'" target="_blank" title="Website for The Fast Layne>The Fast Layne (Web)</a> /
+        <a href="'$THEFASTLAYNE_WEB'" target="_blank" title="Website for The Fast Layne">The Fast Layne (Web)</a> /
         <a href="'$THEFASTLAYNE_GITHUB'" target="_blank" title="GitHub for The Fast Layne">The FastLayne (GitHub)</a> /
         <a href="'$MY_GITHUB'" target="_blank" title="GitHub for Kamaran Layne">KamaranL (GitHub)</a>
       </div>
@@ -303,7 +303,10 @@ installMariaDb ()
   fi
   systemctl start mariadb
   systemctl enable mariadb
-  MYSQL_PASS=$(whiptail --passwordbox "Please set a password for user 'root':" 8 78 --title "MariaDB Root Password" 3>&1 1>&2 2>&3)
+  MYSQL_PASS=$(
+    whiptail --passwordbox "Please set a password for user 'root': " 8 42 --title "MariaDB Root Password" --nocancel \
+    3>&1 1>&2 2>&3 \
+  )
   mysqladmin -u root password $MYSQL_PASS
   echo -e "${GREEN}MariaDB Installed!${NC}\n"
 }
