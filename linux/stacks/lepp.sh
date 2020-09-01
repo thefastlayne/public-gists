@@ -1,8 +1,8 @@
 #!/bin/bash
-#  @title LEMP Installer
+#  @title LEPP Installer
 #  @author Kamaran Layne <github.com/KamaranL>
 #  @system Debian 8,9 | Ubuntu 16,18,20 | CentOS 7,8 | RedHat Enterprise Linux 7,8
-#  @description This script will install Nginx 1.x.x, MariaDB 10.5.x, PHP 7.4.x and phpMyAdmin 5.0.x
+#  @description This script will install Nginx 1.x.x, PostgreSQL 12.x, PHP 7.3.x and phpPgAdmin 7.12.x
 
 __construct ()
 {
@@ -15,11 +15,11 @@ __construct ()
   if [ "$DIST" = "debian" -o "$DIST" = "ubuntu" ]; then
     WEB_ROOT="/var/www/"
     PHP_SOCKET="unix:/run/php/php7.4-fpm.sock"
-    PMA_ROOT="/usr/share/"
+    PPA_ROOT="/usr/share/"
   elif [ "$DIST" = "centos" -o "$DIST" = "rhel" ]; then
     WEB_ROOT="/usr/share/nginx/"
     PHP_SOCKET="unix:/run/php-fpm/www.sock"
-    PMA_ROOT="$WEB_ROOT"
+    PPA_ROOT="$WEB_ROOT"
   fi
   MY_GITHUB="https://github.com/KamaranL/"
   THEFASTLAYNE_WEB="https://www.thefastlayne.net/"
@@ -29,13 +29,18 @@ __construct ()
 installPrereqs ()
 {
   if [ "$DIST" = "debian" -o "$DIST" = "ubuntu" ]; then
-    apt-get update
-    apt-get install -y wget tar bzip2 software-properties-common dirmngr apt-transport-https ca-certificates
+  apt-get update
+  apt-get install -y wget tar bzip2 software-properties-common dirmngr apt-transport-https ca-certificates
   elif [ "$DIST" = "centos" -o "$DIST" = "rhel" ]; then
     yum clean all
     rm -rf /var/cache/yum/*
     yum -y update
     yum install -y tar wget bzip2 yum-utils epel-release http://rpms.remirepo.net/enterprise/remi-release-$VER.rpm
+    if [ $VER = 7 ]; then
+      yum install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+    elif [ $VER = 8 ]; then
+      dnf install https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+    fi
   fi
 }
 
@@ -43,7 +48,7 @@ installNginx ()
 {
   echo -e "${YELLOW}Installing Nginx...${NC}\n"
   if [ "$DIST" = "debian" -o "$DIST" = "ubuntu" ]; then
-    echo -e "\n\n#LEMP Sources:\n" >> /etc/apt/sources.list
+    echo -e "\n\n#LEPP Sources:\n" >> /etc/apt/sources.list
     wget -P /tmp http://nginx.org/keys/nginx_signing.key
     apt-key add /tmp/nginx_signing.key
     add-apt-repository "deb http://nginx.org/packages/mainline/$DIST/ $CODE nginx"
@@ -97,7 +102,7 @@ installNginx ()
         try_files $uri =404;
         include global/fastcgi_php.conf;
       }
-      include aliases/phpmyadmin.conf;
+      include aliases/phppgadmin.conf;
     }' > /etc/nginx/conf.d/default.conf
 
   # /etc/nginx/conf.d/default-ssl
@@ -143,7 +148,7 @@ installNginx ()
         try_files $uri =404;
         include global/fastcgi_php.conf;
       }
-      include aliases/phpmyadmin.conf;
+      include aliases/phppgadmin.conf;
     }' > /etc/nginx/conf.d/default-ssl
 
   # /etc/nginx/conf.d/proxy
@@ -249,7 +254,7 @@ gzip_buffers 16 8k;' > /etc/nginx/global/gzip.conf
         You can get started by:
         <ul>
           <li>replacing this file (<code>index.php</code>) at <code><?= dirname(__FILE__); ?></code></li>
-          <li>logging into <a href="/phpmyadmin" target="_blank">phpMyAdmin</a> and creating your first database</li>
+          <li>logging into <a href="/phppgadmin" target="_blank">phpPgAdmin</a> and creating your first database</li>
           <li>visiting <a href="'$THEFASTLAYNE_GITHUB'" target="_blank">our GitHub</a> and starring the "public-gists" repo if it helped you out in any way</li>
         </ul>
       </div>
@@ -274,38 +279,32 @@ gzip_buffers 16 8k;' > /etc/nginx/global/gzip.conf
   echo -e "${GREEN}Nginx Installed!${NC}\n"
 }
 
-installMariaDb ()
+installPostgreSql ()
 {
-  echo -e "${YELLOW}Installing MariaDB...${NC}\n"
+  echo -e "${YELLOW}Installing PostgreSQL...${NC}\n"
   if [ "$DIST" = "debian" -o "$DIST" = "ubuntu" ]; then
-    apt-key adv --recv-keys --keyserver hkp://keyserver.ubuntu.com:80 0xF1656F24C74CD1D8
-    add-apt-repository "deb [arch=amd64] http://nyc2.mirrors.digitalocean.com/mariadb/repo/10.5/$DIST $CODE main"
+    wget -P /tmp https://www.postgresql.org/media/keys/ACCC4CF8.asc
+    apt-key add /tmp/ACCC4CF8.asc
+    add-apt-repository "deb http://apt.postgresql.org/pub/repos/apt/ $CODE-pgdg main"
     apt-get update
-    apt-get install -y mariadb-server
+    apt-get install -y postgresql-12 postgresql-client-12
+    systemctl start postgresql
+    systemctl enable postgresql
   elif [ "$DIST" = "centos" -o "$DIST" = "rhel" ]; then
-    echo -e "[mariadb]\n\
-      name = MariaDB\n\
-      baseurl = http://nyc2.mirrors.digitalocean.com/mariadb/yum/10.5/$DIST$VER-amd64\n\
-      gpgkey=http://nyc2.mirrors.digitalocean.com/mariadb/yum/RPM-GPG-KEY-MariaDB\n\
-      gpgcheck=1" | sed -e "s|^[[:space:]]*||" > /etc/yum.repos.d/mariadb.repo
     yum update -y
     if [ $VER = 7 ]; then
-      yum install -y MariaDB-server MariaDB-client
+      yum install -y postgresql12-server
     elif [ $VER = 8 ]; then
-      if [ $DIST = "centos" ]; then
-        dnf install -y boost-program-options
-        dnf install -y MariaDB-server MariaDB-client --disablerepo=AppStream
-      elif [ $DIST = "rhel" ]; then
-        dnf install -y boost-program-options
-        dnf install -y MariaDB-server MariaDB-client --disablerepo=rhel-8-for-x86_64-appstream-rpms
-      fi
+      dnf -qy module disable postgresql
+      dnf install postgresql12-server
     fi
+    /usr/pgsql-12/bin/postgresql-12-setup initdb
+    systemctl start postgresql-12
+    systemctl enable postgresql-12
   fi
-  systemctl start mariadb
-  systemctl enable mariadb
-  MYSQL_PASS=$(whiptail --passwordbox "Please set a password for user 'root':" 8 78 --title "MariaDB Root Password" 3>&1 1>&2 2>&3)
-  mysqladmin -u root password $MYSQL_PASS
-  echo -e "${GREEN}MariaDB Installed!${NC}\n"
+  PG_PASS=$(whiptail --passwordbox "Please set a password for user 'postgres':" 8 78 --title "PostgreSQL Postgres Password" 3>&1 1>&2 2>&3)
+  sudo -u postgres psql -U postgres -d postgres -c "ALTER USER POSTGRES WITH PASSWORD '$PG_PASS';"
+  echo -e "${GREEN}PostgreSQL Installed!${NC}\n"
 }
 
 installPhp ()
@@ -319,7 +318,7 @@ installPhp ()
       add-apt-repository "deb https://packages.sury.org/php/ $CODE main"
     fi
     apt-get update
-    apt-get install -y php7.4-bcmath php7.4-bz2 php7.4-cgi php7.4-cli php7.4-common php7.4-curl php7.4-fpm php7.4-gd php-imagick php7.4-imap php7.4-intl php7.4-json php7.4-ldap php7.4-mbstring php7.4-mysql php-pear php7.4-soap php7.4-tidy php7.4-xml php7.4-xmlrpc php7.4-zip
+    apt-get install -y php7.4-bcmath php7.4-bz2 php7.4-cgi php7.4-cli php7.4-common php7.4-curl php7.4-fpm php7.4-gd php-imagick php7.4-imap php7.4-intl php7.4-json php7.4-ldap php7.4-mbstring php-pear php7.4-pgsql php7.4-soap php7.4-tidy php7.4-xml php7.4-xmlrpc php7.4-zip
     sed -i "s|;date.timezone =|date.timezone = $(sed 's|\/|\\\/|' /etc/timezone)|g" /etc/php/7.4/fpm/php.ini
     sed -i "s|;extension=bz2|extension=bz2|g" /etc/php/7.4/fpm/php.ini
     sed -i "s|;extension=curl|extension=curl|g" /etc/php/7.4/fpm/php.ini
@@ -331,9 +330,10 @@ installPhp ()
     sed -i "s|;extension=ldap|extension=ldap|g" /etc/php/7.4/fpm/php.ini
     sed -i "s|;extension=mbstring|extension=mbstring|g" /etc/php/7.4/fpm/php.ini
     sed -i "s|;extension=exif|extension=exif|g" /etc/php/7.4/fpm/php.ini
-    sed -i "s|;extension=mysqli|extension=mysqli|g" /etc/php/7.4/fpm/php.ini
     sed -i "s|;extension=openssl|extension=openssl|g" /etc/php/7.4/fpm/php.ini
-    sed -i "s|;extension=pdo_mysql|extension=pdo_mysql|g" /etc/php/7.4/fpm/php.ini
+    sed -i "s|;extension=pdo_pgsql|extension=pdo_pgsql|g" /etc/php/7.4/fpm/php.ini
+    sed -i "s|;extension=pgsql|extension=pgsql|g" /etc/php/7.4/fpm/php.ini
+    sed -i "s|;extension=soap|extension=soap|g" /etc/php/7.4/fpm/php.ini
     systemctl enable php7.4-fpm
     systemctl start php7.4-fpm
   elif [ "$DIST" = "centos" -o "$DIST" = "rhel" ]; then
@@ -341,11 +341,11 @@ installPhp ()
       yum-config-manager --disable remi-php54 > /dev/null 2>&1
       yum-config-manager --enable remi-php74 > /dev/null 2>&1
       yum update -y
-      yum install -y php php-bcmath php-bz2 php-cgi php-cli php-common php-curl php-fpm php-gd php-imagick php-imap php-intl php-json php-ldap php-mbstring php-mysql php-opcache php-pdo php-pear php-recode php-soap php-tidy php-xml php-xmlrpc php-zip
+      yum install -y php php-bcmath php-bz2 php-cgi php-cli php-common php-curl php-fpm php-gd php-imagick php-imap php-intl php-json php-ldap php-mbstring php-opcache php-pdo php-pgsql php-pear php-recode php-soap php-tidy php-xml php-xmlrpc php-zip
     elif [ $VER = 8 ]; then
       dnf module reset php
       dnf module enable -y php:remi-7.4
-      dnf install -y php php-bcmath php-bz2 php-cgi php-cli php-common php-curl php-fpm php-gd php-imagick php-imap php-intl php-json php-ldap php-mbstring php-mysql php-opcache php-pdo php-pear php-recode php-soap php-tidy php-xml php-xmlrpc php-zip
+      dnf install -y php php-bcmath php-bz2 php-cgi php-cli php-common php-curl php-fpm php-gd php-imagick php-imap php-intl php-json php-ldap php-mbstring php-opcache php-pdo php-pgsql php-pear php-recode php-soap php-tidy php-xml php-xmlrpc php-zip
     fi
     sed -i "s|;date.timezone =|date.timezone = $(timedatectl | awk '/Time zone:/ {print $3}')|g" /etc/php.ini
     sed -i 's|;cgi.fix_pathinfo=1|cgi.fix_pathinfo=0|g' /etc/php.ini
@@ -360,45 +360,41 @@ installPhp ()
   echo -e "${GREEN}PHP Installed!${NC}\n"
 }
 
-installPhpmyadmin ()
+installPhppgadmin ()
 {
-  echo -e "${YELLOW}Installing phpMyAdmin...${NC}\n"
-  wget -P /tmp https://files.phpmyadmin.net/phpMyAdmin/5.0.2/phpMyAdmin-5.0.2-english.tar.gz
-  tar xzf /tmp/phpMyAdmin-5.0.2-english.tar.gz -C /usr/share
-  mv /usr/share/phpMyAdmin-5.0.2-english "$PMA_ROOT"phpmyadmin
-  cp "$PMA_ROOT"phpmyadmin/config.sample.inc.php "$PMA_ROOT"phpmyadmin/config.inc.php
+  echo -e "${YELLOW}Installing phpPgAdmin...${NC}\n"
+  wget -P /tmp https://github.com/phppgadmin/phppgadmin/releases/download/REL_7-12-1/phpPgAdmin-7.12.1.tar.gz
+  tar xzf /tmp/phpPgAdmin-7.12.1.tar.gz -C /usr/share
+  mv /usr/share/phpPgAdmin-7.12.1 "$PPA_ROOT"phppgadmin
+  cp "$PPA_ROOT"phppgadmin/conf/config.inc.php-dist "$PPA_ROOT"phppgadmin/conf/config.inc.php
   mkdir /etc/nginx/aliases
 
-  # /etc/nginx/aliases/phpmyadmin.conf
-  echo -e '# Alias /phpmyadmin
-    location /phpmyadmin {
+  # /etc/nginx/aliases/phppgadmin.conf
+  echo -e '# Alias /phppgadmin
+    location /phppgadmin {
       index index.php index.html index.htm;
-      root '$PMA_ROOT';
-      location ~ ^/phpmyadmin/(.+\.php)$ {
+      root '$PPA_ROOT';
+      location ~ ^/phppgadmin/(.+\.php)$ {
         try_files $uri =404;
-        root '$PMA_ROOT';
+        root '$PPA_ROOT';
         include global/fastcgi_php.conf;
       }
-      location ~* ^/phpmyadmin/(.+\.(jpg|jpeg|gif|css|png|js|ico|html|xml|txt))$ {
-        root '$PMA_ROOT';
+      location ~* ^/phppgadmin/(.+\.(jpg|jpeg|gif|css|png|js|ico|html|xml|txt))$ {
+        root '$PPA_ROOT';
       }
     }
-    location /phpMyAdmin {
-      rewrite ^/* /phpmyadmin last;
-    }' > /etc/nginx/aliases/phpmyadmin.conf
-  sed -i "s|define('CONFIG_DIR', '');|define('CONFIG_DIR', './');|g" "$PMA_ROOT"phpmyadmin/libraries/vendor_config.php
+    location /phpPgAdmin {
+      rewrite ^/* /phppgadmin last;
+    }
+  ' > /etc/nginx/aliases/phppgadmin.conf
+  sed -i "s|conf\['extra_login_security'\] = true;|conf\['extra_login_security'\] = false;|g" "$PPA_ROOT"phppgadmin/conf/config.inc.php
   if [ "$DIST" = "debian" -o "$DIST" = "ubuntu" ]; then
-    mkdir "$PMA_ROOT"phpmyadmin/libraries/tmp
+    sed -i "s|  trust|  md5|g" /etc/postgresql/12/main/pg_hba.conf
+    sed -i "s|  peer|  md5|g" /etc/postgresql/12/main/pg_hba.conf
   elif [ "$DIST" = "centos" -o "$DIST" = "rhel" ]; then
-    sed -i "s|define('TEMP_DIR', ROOT_PATH . 'tmp/');|define('TEMP_DIR', '/tmp/');|g" "$PMA_ROOT"phpmyadmin/libraries/vendor_config.php
+    sed -i "s|  peer|  md5|g" /var/lib/pgsql/12/data/pg_hba.conf
   fi
-  BFS=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
-  sed -i "s|cfg\['blowfish_secret'\] = '';|cfg\['blowfish_secret'\] = '$BFS';|g" "$PMA_ROOT"phpmyadmin/config.inc.php
-  PMA_PASS=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 10 | head -n 1)
-  PMA_QUERY="CREATE USER 'phpmyadmin'@'localhost' IDENTIFIED BY '$PMA_PASS'; GRANT USAGE ON *.* TO 'phpmyadmin'@'localhost' REQUIRE NONE WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0; CREATE DATABASE IF NOT EXISTS \`phpmyadmin\`; GRANT ALL PRIVILEGES ON \`phpmyadmin\`.* TO 'phpmyadmin'@'localhost'; FLUSH PRIVILEGES;"
-  mysql -e "$PMA_QUERY"
-  mysql -u root -D phpmyadmin < "$PMA_ROOT"phpmyadmin/sql/create_tables.sql
-  echo -e "${GREEN}phpMyAdmin Installed!\n"
+  echo -e "${GREEN}phpPgAdmin Installed!\n"
 }
 
 checkForUpdates ()
@@ -415,11 +411,11 @@ repairPermissions ()
 {
   echo -e "${GREEN}Reparing permissions...\n"
   if [ "$DIST" = "debian" -o "$DIST" = "ubuntu" ]; then
-    chown -R www-data:www-data "$WEB_ROOT" "$PMA_ROOT"phpmyadmin
+    chown -R www-data:www-data "$WEB_ROOT" "$PPA_ROOT"phppgadmin
   elif [ "$DIST" = "centos" -o "$DIST" = "rhel" ]; then
     chown -R nginx:nginx "$WEB_ROOT" /etc/nginx /var/lib/php
   fi
-  chmod -R 0775 "$WEB_ROOT" "$PMA_ROOT"phpmyadmin /etc/nginx
+  chmod -R 0775 "$WEB_ROOT" "$PPA_ROOT"phppgadmin /etc/nginx
 }
 
 configureSeLinux ()
@@ -445,10 +441,11 @@ restartServices ()
   echo -e "Restarting all services...${NC}\n"
   systemctl restart nginx
   nginx -s reload
-  systemctl restart mariadb
   if [ "$DIST" = "debian" -o "$DIST" = "ubuntu" ]; then
+    systemctl restart postgresql
     systemctl restart php7.4-fpm
   elif [ "$DIST" = "centos" -o "$DIST" = "rhel" ]; then
+    systemctl restart postgresql-12
     systemctl restart php-fpm
   fi
 }
@@ -459,9 +456,9 @@ main ()
     __construct
     installPrereqs
     installNginx
-    installMariaDb
+    installPostgreSql
     installPhp
-    installPhpmyadmin
+    installPhppgadmin
     checkForUpdates
     repairPermissions
     if [ "$DIST" = "centos" -o "$DIST" = "rhel" ]; then
@@ -469,7 +466,7 @@ main ()
       configureFirewall
     fi
     restartServices
-    echo -e "Your LEMP stack is successfully installed and configured.\nYou can access your webserver at ${YELLOW}$(hostname -I)${NC}"
+    echo -e "Your LEPP stack is successfully installed and configured.\nYou can access your webserver at ${YELLOW}$(hostname -I)${NC}"
     exit 0
   else
     echo "ERROR: Please run again as root."
