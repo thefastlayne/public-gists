@@ -7,7 +7,7 @@
 selectStack ()
 {
   STACK=$(
-    whiptail --title "Popular Tech Stacks" --radiolist "Select a tech stack to install or choose custom for individual components : " 12 56 5 \
+    whiptail --title "Popular Tech Stacks" --radiolist "Select a tech stack to install or choose custom for individual components: " 12 56 5 \
       "LEMP" "Nginx, MariaDB, PHP " off \
       "LEPP" "Nginx, PostgreSQL, PHP " off \
       "LEPD" "Nginx, PostgreSQL, Dotnet " off \
