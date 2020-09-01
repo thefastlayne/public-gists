@@ -39,7 +39,7 @@ installPrereqs ()
     if [ $VER = 7 ]; then
       yum install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm
     elif [ $VER = 8 ]; then
-      dnf install https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
+      dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
     fi
   fi
 }
@@ -296,7 +296,7 @@ installPostgreSql ()
       yum install -y postgresql12-server
     elif [ $VER = 8 ]; then
       dnf -qy module disable postgresql
-      dnf install postgresql12-server
+      dnf install -y postgresql-server
     fi
     /usr/pgsql-12/bin/postgresql-12-setup initdb
     systemctl start postgresql-12
