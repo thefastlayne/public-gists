@@ -1,2 +1,3 @@
-# public-gists
-A repository to store all public gists since organizations cannot create gists.
+# Public Gists #
+
+A repository to store all public gists for The Fast Layne
