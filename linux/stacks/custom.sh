@@ -36,7 +36,7 @@
 
 selectCustom ()
 {
-  whiptail --title "Custom Stack" --checklist --separate-output "Select custom components to install: " 19 56 15 \
+  whiptail --title "Custom Stack" --checklist --separate-output "Select custom components to install: " 25 100 15 \
     "Nginx" "A high performance load balancer, web server, & reverse proxy" off \
     "MariaDB" "A community developed fork of the MySQL database management system" off \
     "PostgreSQL" "A powerful, open source object-relational database system" off \
