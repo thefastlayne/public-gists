@@ -61,6 +61,16 @@ selectStack ()
   esac
 }
 
+checkForUpdates ()
+{
+  echo -e "Upgrading newly installed packages...${NC}\n"
+  if [ "$DIST" = "debian" -o "$DIST" = "ubuntu" ]; then
+    apt-get upgrade -y
+  elif [ "$DIST" = "centos" -o "$DIST" = "rhel" ]; then
+    yum update -y
+  fi
+}
+
 ##############
 # MAIN       #
 ##############
@@ -72,6 +82,7 @@ main ()
     __construct
     installPrerequisites
     selectStack
+    checkForUpdates
     exit 0
   else
     echo "ERROR: Please run again as root."

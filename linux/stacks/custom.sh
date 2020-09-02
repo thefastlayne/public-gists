@@ -1,38 +1,4 @@
 #!/bin/bash
-#  @title Custom Component Script
-#  @author Kamaran Layne <github.com/KamaranL>
-#  @system Debian 8,9 | Ubuntu 16,18,20 | CentOS 7,8 | RedHat Enterprise Linux 7,8
-#  @description Select what components you want to install and it installs your dev environment for you
-
-##############
-# WEB SERVER #
-##############
-#
-#
-
-
-
-##############
-# DATABASE   #
-##############
-#
-#
-
-
-
-##############
-# BACKEND    #
-##############
-#
-#
-
-
-##############
-# FRONTEND   #
-##############
-#
-#
-
 
 selectCustom ()
 {
@@ -57,17 +23,11 @@ selectCustom ()
 
   while read COMPONENT; do
     case $COMPONENT in
-      "") install ;;
-      # "") install ;;
+      # "");;
     esac
   done < COMPONENTS
 }
 
-##############
-# MAIN       #
-##############
-#
-#
 main ()
 {
   if [ "$USER" == "root" ]; then

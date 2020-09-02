@@ -459,13 +459,16 @@ restartServices ()
 main ()
 {
   if [ "$USER" == "root" ]; then
-    __construct
-    installPrereqs
-    installNginx
-    installMariaDb
-    installPhp
-    installPhpmyadmin
-    checkForUpdates
+    # installNginx
+    # installMariaDb
+    # installPhp
+    # installPhpmyadmin
+
+    curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/nginx.sh" | bash;;
+    curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/mariadb.sh" | bash;;
+    curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/php.sh" | bash -s -- --mariadb;;
+
+    # checkForUpdates
     repairPermissions
     if [ "$DIST" = "centos" -o "$DIST" = "rhel" ]; then
       configureSeLinux
