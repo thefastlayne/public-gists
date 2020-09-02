@@ -42,17 +42,6 @@ installStack ()
   esac
 }
 
-checkForUpdates ()
-{
-  echo -e "${YELLOW}Upgrading newly installed packages...${NC}\n"
-  if [ "$DIST" = "debian" -o "$DIST" = "ubuntu" ]; then
-    apt-get upgrade -y
-  elif [ "$DIST" = "centos" -o "$DIST" = "rhel" ]; then
-    yum update -y
-  fi
-  echo -e "${GREEN}Packages upgraded!${NC}\n"
-}
-
 ##############
 # MAIN       #
 ##############
@@ -64,7 +53,6 @@ main ()
     source <(curl -s https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/__construct.sh)
     installPrerequisites
     installStack
-    checkForUpdates
     exit 0
   else
     echo "ERROR: Please run again as root."
