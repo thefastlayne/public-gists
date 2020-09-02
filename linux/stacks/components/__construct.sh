@@ -26,7 +26,6 @@ main ()
 {
   if [ "$USER" == "root" ]; then
     __construct
-    exit 0
   else
     echo "ERROR: Please run again as root."
     exit 1
