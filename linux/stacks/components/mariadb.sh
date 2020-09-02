@@ -41,7 +41,7 @@ installMariaDb ()
 main ()
 {
   if [ "$USER" == "root" ]; then
-    source <(curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/__construct.sh")
+    curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/__construct.sh" | bash
     installMariaDb
     exit 0
   else

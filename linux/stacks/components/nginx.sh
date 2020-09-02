@@ -238,7 +238,7 @@ gzip_buffers 16 8k;' > /etc/nginx/global/gzip.conf
 main ()
 {
   if [ "$USER" == "root" ]; then
-    source <(curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/__construct.sh")
+    curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/__construct.sh" | bash
     installNginx
     exit 0
   else
