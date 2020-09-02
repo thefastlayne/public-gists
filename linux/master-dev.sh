@@ -28,6 +28,7 @@ __construct ()
 
 installPrerequisites ()
 {
+  echo -e "${YELLOW}Installing prerequisites...${NC}\n"
   if [ "$DIST" = "debian" -o "$DIST" = "ubuntu" ]; then
     apt-get clean
     rm -rf /var/cache/apt/archives/*
@@ -39,10 +40,12 @@ installPrerequisites ()
     yum -y update
     yum install -y tar wget bzip2 curl yum-utils epel-release
   fi
+  echo -e "${GREEN}Prerequisites installed!${NC}\n"
 }
 
 selectStack ()
 {
+  echo -e "${YELLOW}Launching Stack Selection...${NC}\n"
   STACK=$(
     whiptail --title "Popular Tech Stacks" --radiolist "Select a tech stack to install or choose custom for individual components: " 12 56 5 \
       "LEMP" "Nginx, MariaDB, PHP " off \
@@ -69,6 +72,7 @@ checkForUpdates ()
   elif [ "$DIST" = "centos" -o "$DIST" = "rhel" ]; then
     yum update -y
   fi
+  echo -e "${GREEN}Packages upgraded!${NC}\n"
 }
 
 ##############
