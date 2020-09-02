@@ -44,7 +44,7 @@ installStack ()
 
 checkForUpdates ()
 {
-  echo -e "Upgrading newly installed packages...${NC}\n"
+  echo -e "${YELLOW}Upgrading newly installed packages...${NC}\n"
   if [ "$DIST" = "debian" -o "$DIST" = "ubuntu" ]; then
     apt-get upgrade -y
   elif [ "$DIST" = "centos" -o "$DIST" = "rhel" ]; then
