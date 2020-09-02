@@ -456,13 +456,15 @@ restartServices ()
 main ()
 {
   if [ "$USER" == "root" ]; then
-    __construct
-    installPrereqs
-    installNginx
-    installPostgreSql
-    installPhp
-    installPhppgadmin
-    checkForUpdates
+    # installNginx
+    # installPostgreSql
+    # installPhp
+    # installPhppgadmin
+
+    # curl -s  | bash -s -- --postgresql;;
+
+
+    # checkForUpdates
     repairPermissions
     if [ "$DIST" = "centos" -o "$DIST" = "rhel" ]; then
       configureSeLinux
