@@ -135,13 +135,12 @@ installPhp ()
 main ()
 {
   if [ "$USER" == "root" ]; then
-    bash <(curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/__construct.sh")
+    source <(curl -s https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/__construct.sh)
     installPhp
     case "$1" in
       "--mariadb") installPhpmyadmin;;
       "--postgresql") installPhppgadmin;;
     esac
-    exit 0
   else
     echo "ERROR: Please run again as root."
     exit 1

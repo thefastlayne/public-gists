@@ -238,9 +238,8 @@ gzip_buffers 16 8k;' > /etc/nginx/global/gzip.conf
 main ()
 {
   if [ "$USER" == "root" ]; then
-    bash <(curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/__construct.sh")
+    source <(curl -s https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/__construct.sh)
     installNginx
-    exit 0
   else
     echo "ERROR: Please run again as root."
     exit 1

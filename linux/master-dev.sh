@@ -21,7 +21,7 @@ installPrerequisites ()
   echo -e "${GREEN}Prerequisites installed!${NC}\n"
 }
 
-selectStack ()
+installStack ()
 {
   echo -e "${YELLOW}Launching Stack Selection...${NC}\n"
   STACK=$(
@@ -61,9 +61,9 @@ checkForUpdates ()
 main ()
 {
   if [ "$USER" == "root" ]; then
-    bash <(curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/__construct.sh")
+    source <(curl -s https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/__construct.sh)
     installPrerequisites
-    selectStack
+    installStack
     checkForUpdates
     exit 0
   else
