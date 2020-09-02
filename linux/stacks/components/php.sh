@@ -135,6 +135,7 @@ installPhp ()
 main ()
 {
   if [ "$USER" == "root" ]; then
+    source <(curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/__construct.sh")
     installPhp
     case "$1" in
       "--mariadb") installPhpmyadmin;;

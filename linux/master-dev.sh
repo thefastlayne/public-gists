@@ -4,28 +4,6 @@
 #  @system Debian 8,9 | Ubuntu 16,18,20 | CentOS 7,8 | RedHat Enterprise Linux 7,8
 #  @description Select what stack OR components you want to install
 
-__construct ()
-{
-  export RED='\033[0;31m'
-  export YELLOW='\033[1;33m'
-  export GREEN='\033[0;32m'
-  export NC='\033[0m'
-  export DIST=$(awk -F= '/^ID=/{print $2}' /etc/os-release | sed 's|"||g')
-  export VER=$(awk -F= '/^VERSION_ID=/{print $2}' /etc/os-release | sed 's|"||g' | sed -e "s|[.].*||")
-  if [ "$DIST" = "debian" -o "$DIST" = "ubuntu" ]; then
-    export WEB_ROOT="/var/www/"
-    export PHP_SOCKET="unix:/run/php/php7.4-fpm.sock"
-    export DBM_ROOT="/usr/share/"
-  elif [ "$DIST" = "centos" -o "$DIST" = "rhel" ]; then
-    export WEB_ROOT="/usr/share/nginx/"
-    export PHP_SOCKET="unix:/run/php-fpm/www.sock"
-    export DBM_ROOT="$WEB_ROOT"
-  fi
-  export MY_GITHUB="https://github.com/KamaranL/"
-  export THEFASTLAYNE_WEB="https://www.thefastlayne.net/"
-  export THEFASTLAYNE_GITHUB="https://github.com/TheFastLayne/"
-}
-
 installPrerequisites ()
 {
   echo -e "${YELLOW}Installing prerequisites...${NC}\n"
@@ -83,6 +61,7 @@ checkForUpdates ()
 main ()
 {
   if [ "$USER" == "root" ]; then
+    source <(curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/__construct.sh")
     __construct
     installPrerequisites
     selectStack
