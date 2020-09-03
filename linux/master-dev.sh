@@ -2,7 +2,7 @@
 #  @title Master-Dev Installer
 #  @author Kamaran Layne <github.com/KamaranL>
 #  @system Debian 8,9 | Ubuntu 16,18,20 | CentOS 7,8 | RedHat Enterprise Linux 7,8
-#  @description Select what stack OR components you want to install
+#  @description Select what stack OR stack components you want to install
 
 installPrerequisites ()
 {
@@ -42,6 +42,27 @@ installStack ()
   esac
 }
 
+checkForUpdates ()
+{
+  echo -e "${YELLOW}Upgrading newly installed packages...${NC}\n"
+  if [ "$DIST" = "debian" -o "$DIST" = "ubuntu" ]; then
+    apt-get upgrade -y
+  elif [ "$DIST" = "centos" -o "$DIST" = "rhel" ]; then
+    yum update -y
+  fi
+}
+
+restartServices ()
+{
+  echo -e "${YELLOW}Restarting all services...${NC}\n"
+  SERVICES=(nginx mariadb postgresql postgresql-12 php7.4-fpm php-fpm)
+  for service in "${SERVICES[@]}"; do
+    if systemctl status "$service" "$QUIET"; then
+      systemctl restart "$service"
+    fi
+  done
+}
+
 ##############
 # MAIN       #
 ##############
@@ -53,6 +74,8 @@ main ()
     source <(curl -s https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/__construct.sh)
     installPrerequisites
     installStack
+    checkForUpdates
+    restartServices
     exit 0
   else
     echo "ERROR: Please run again as root."

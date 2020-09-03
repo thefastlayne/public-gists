@@ -8,6 +8,7 @@ __construct ()
   NC='\033[0m'
   DIST=$(awk -F= '/^ID=/{print $2}' /etc/os-release | sed 's|"||g')
   VER=$(awk -F= '/^VERSION_ID=/{print $2}' /etc/os-release | sed 's|"||g' | sed -e "s|[.].*||")
+  QUIET="/dev/null 2>&1"
   if [ "$DIST" = "debian" -o "$DIST" = "ubuntu" ]; then
     WEB_ROOT="/var/www/"
     PHP_SOCKET="unix:/run/php/php7.4-fpm.sock"
