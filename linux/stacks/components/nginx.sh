@@ -10,6 +10,7 @@ installNginx ()
     apt-get update
     apt-get install -y nginx
     usermod -a -G www-data nginx
+    chown -R www-data:www-data "$WEB_ROOT"
   elif [ "$DIST" = "centos" -o "$DIST" = "rhel" ]; then
     echo -e "[nginx]\n\
       name=nginx repo\n\
@@ -19,6 +20,7 @@ installNginx ()
     yum update -y
     yum install -y nginx
     rm -rf /etc/nginx/conf.d/*.conf
+    chown -R nginx:nginx "$WEB_ROOT" /etc/nginx
   fi
   mkdir /etc/nginx/global "$WEB_ROOT"html
 
@@ -231,15 +233,37 @@ gzip_buffers 16 8k;' > /etc/nginx/global/gzip.conf
   fi
   systemctl start nginx
   systemctl enable nginx
+  chmod -R 0775 "$WEB_ROOT" /etc/nginx
   echo -e "${GREEN}Nginx Installed!${NC}\n"
 }
 
+configureSeLinux ()
+{
+  setsebool -P httpd_can_network_connect=1
+  setsebool -P httpd_can_network_connect_db=1
+  setsebool -P httpd_can_network_memcache=1
+  setsebool -P httpd_can_network_relay=1
+  setsebool -P httpd_can_sendmail=1
+  setsebool -P httpd_enable_cgi=1
+  setsebool -P httpd_enable_homedirs=1
+}
+
+configureFirewall ()
+{
+  firewall-cmd --permanent --zone=public --add-service=http > /dev/null 2>&1
+  firewall-cmd --permanent --zone=public --add-service=https > /dev/null 2>&1
+  firewall-cmd --reload > /dev/null 2>&1
+}
 
 main ()
 {
   if [ "$USER" == "root" ]; then
     source <(curl -s https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/__construct.sh)
     installNginx
+    if [ "$DIST" = "centos" -o "$DIST" = "rhel" ]; then
+      configureSeLinux
+      configureFirewall
+    fi
   else
     echo "ERROR: Please run again as root."
     exit 1

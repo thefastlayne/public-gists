@@ -29,8 +29,10 @@ installPhpmyadmin ()
   sed -i "s|define('CONFIG_DIR', '');|define('CONFIG_DIR', './');|g" "$DBM_ROOT"phpmyadmin/libraries/vendor_config.php
   if [ "$DIST" = "debian" -o "$DIST" = "ubuntu" ]; then
     mkdir "$DBM_ROOT"phpmyadmin/libraries/tmp
+    chown -R www-data:www-data "$DBM_ROOT"phpmyadmin
   elif [ "$DIST" = "centos" -o "$DIST" = "rhel" ]; then
     sed -i "s|define('TEMP_DIR', ROOT_PATH . 'tmp/');|define('TEMP_DIR', '/tmp/');|g" "$DBM_ROOT"phpmyadmin/libraries/vendor_config.php
+    chown -R nginx:nginx "$DBM_ROOT"phpmyadmin
   fi
   BFS=$(cat /dev/urandom | tr -dc 'a-zA-Z0-9' | fold -w 32 | head -n 1)
   sed -i "s|cfg\['blowfish_secret'\] = '';|cfg\['blowfish_secret'\] = '$BFS';|g" "$DBM_ROOT"phpmyadmin/config.inc.php
@@ -38,6 +40,7 @@ installPhpmyadmin ()
   PMA_QUERY="CREATE USER 'phpmyadmin'@'localhost' IDENTIFIED BY '$PMA_PASS'; GRANT USAGE ON *.* TO 'phpmyadmin'@'localhost' REQUIRE NONE WITH MAX_QUERIES_PER_HOUR 0 MAX_CONNECTIONS_PER_HOUR 0 MAX_UPDATES_PER_HOUR 0 MAX_USER_CONNECTIONS 0; CREATE DATABASE IF NOT EXISTS \`phpmyadmin\`; GRANT ALL PRIVILEGES ON \`phpmyadmin\`.* TO 'phpmyadmin'@'localhost'; FLUSH PRIVILEGES;"
   mysql -e "$PMA_QUERY"
   mysql -u root -D phpmyadmin < "$DBM_ROOT"phpmyadmin/sql/create_tables.sql
+  chmod -R 0775 "$DBM_ROOT"phpmyadmin
   echo -e "${GREEN}phpMyAdmin Installed!\n"
 }
 
@@ -72,9 +75,12 @@ installPhppgadmin ()
   if [ "$DIST" = "debian" -o "$DIST" = "ubuntu" ]; then
     sed -i "s|  trust|  md5|g" /etc/postgresql/12/main/pg_hba.conf
     sed -i "s|  peer|  md5|g" /etc/postgresql/12/main/pg_hba.conf
+    chown -R www-data:www-data "$DBM_ROOT"phppgadmin
   elif [ "$DIST" = "centos" -o "$DIST" = "rhel" ]; then
     sed -i "s|  peer|  md5|g" /var/lib/pgsql/12/data/pg_hba.conf
+    chown -R nginx:nginx "$DBM_ROOT"phppgadmin
   fi
+  chmod -R 0775 "$DBM_ROOT"phppgadmin
   echo -e "${GREEN}phpPgAdmin Installed!\n"
 }
 
@@ -128,6 +134,7 @@ installPhp ()
     sed -i "s|listen = 127.0.0.1:9000|listen = /run/php-fpm/www.sock|g" /etc/php-fpm.d/www.conf
     systemctl enable php-fpm
     systemctl start php-fpm
+    chown -R nginx:nginx /var/lib/php
   fi
   echo -e "${GREEN}PHP Installed!${NC}\n"
 }

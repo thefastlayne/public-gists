@@ -34,11 +34,11 @@ installStack ()
       3>&1 1>&2 2>&3 \
   )
   case $STACK in
-    "LEMP") curl -s https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/lemp.sh | bash;;
-    "LEPP") curl -s https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/lepp.sh | bash;;
-    "LEPD") curl -s https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/lepd.sh | bash;;
-    "LEMD") curl -s https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/lemd.sh | bash;;
-    "Custom") curl -s https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/custom.sh | bash;;
+    "LEMP") curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/lemp.sh" | bash;;
+    "LEPP") curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/lepp.sh" | bash;;
+    "LEPD") curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/lepd.sh" | bash;;
+    "LEMD") curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/lemd.sh" | bash;;
+    "Custom") curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/custom.sh" | bash;;
   esac
 }
 

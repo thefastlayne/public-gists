@@ -1,6 +1,6 @@
 #!/bin/bash
 
-selectCustom ()
+installCustom ()
 {
   whiptail --title "Custom Stack" --checklist --separate-output "Select custom components to install: " 24 134 16 \
     "Nginx" "A high performance load balancer, web server, & reverse proxy " off \
@@ -23,7 +23,22 @@ selectCustom ()
 
   while read COMPONENT; do
     case $COMPONENT in
-      # "");;
+      "Nginx") curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/nginx.sh" | bash;;
+      "MariaDB") curl -s "" | bash;;
+      "PostgreSQL") curl -s "" | bash;;
+      "SQLite") curl -s "" | bash;;
+      "Microsoft SQL") curl -s "" | bash;;
+      "MongoDB") curl -s "" | bash;;
+      "Redis") curl -s "" | bash;;
+      "PHP") curl -s "" | bash;;
+      "Dotnet Core") curl -s "" | bash;;
+      "Node") curl -s "" | bash;;
+      "React") curl -s "" | bash;;
+      "Vue") curl -s "" | bash;;
+      "Angular") curl -s "" | bash;;
+      "Composer") curl -s "" | bash;;
+      "Ruby on Rails") curl -s "" | bash;;
+      "Laravel") curl -s "" | bash;;
     esac
   done < COMPONENTS
 }
@@ -31,7 +46,8 @@ selectCustom ()
 main ()
 {
   if [ "$USER" == "root" ]; then
-    selectCustom
+    source <(curl -s https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/__construct.sh)
+    installCustom
     exit 0
   else
     echo "ERROR: Please run again as root."
