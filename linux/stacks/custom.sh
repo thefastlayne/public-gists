@@ -2,7 +2,7 @@
 
 installCustom ()
 {
-  whiptail --title "Custom Stack" --checklist --separate-output "Select custom components to install: " 24 134 16 \
+  whiptail --title "Custom Stack" --checklist --separate-output "Select custom components to install: " 23 134 16 \
     "Nginx" "A high performance load balancer, web server, & reverse proxy " off \
     "MariaDB" "A community developed fork of the MySQL database management system " off \
     "PostgreSQL" "A powerful, open source object-relational database system " off \
@@ -30,7 +30,7 @@ installCustom ()
       "Microsoft SQL") curl -s "" | bash;;
       "MongoDB") curl -s "" | bash;;
       "Redis") curl -s "" | bash;;
-      "PHP") curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/php.sh" | bash;;
+      "PHP") curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/php.sh" | bash -s -- --mariadb --postgresql;;
       "Dotnet Core") curl -s "" | bash;;
       "Node") curl -s "" | bash;;
       "React") curl -s "" | bash;;
@@ -48,6 +48,7 @@ main ()
   if [ "$USER" == "root" ]; then
     source <(curl -s https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/__construct.sh)
     installCustom
+    echo -e "${GREEN}Your Custom stack is successfully installed and configured.${NC}\nYou can access your webserver at ${YELLOW}$(hostname -I)${NC}"
     exit 0
   else
     echo "ERROR: Please run again as root."
