@@ -211,7 +211,7 @@ gzip_buffers 16 8k;' > /etc/nginx/global/gzip.conf
         You can get started by:
         <ul>
           <li>replacing this file (<code>index.php</code>) at <code><?= dirname(__FILE__); ?></code></li>
-          <li>logging into your online Database Management System,<a href="/phpmyadmin" target="_blank">phpMyAdmin</a> or <a href="/phppgadmin" target="_blank">phpPgAdmin</a>, and creating your first database</li>
+          <li>logging into your online Database Management System, <a href="/phpmyadmin" target="_blank">phpMyAdmin</a> or <a href="/phppgadmin" target="_blank">phpPgAdmin</a>, and creating your first database</li>
           <li>visiting <a href="'$THEFASTLAYNE_GITHUB'" target="_blank">our GitHub</a> and starring the "public-gists" repo if it helped you out in any way</li>
         </ul>
       </div>
