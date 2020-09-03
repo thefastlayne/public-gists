@@ -19,7 +19,7 @@ installPostgreSql ()
     elif [ $VER = 8 ]; then
       dnf install -y https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm
       dnf -qy module disable postgresql
-      dnf install -y postgresql-server
+      dnf install -y postgresql12-server
     fi
     /usr/pgsql-12/bin/postgresql-12-setup initdb
     systemctl start postgresql-12

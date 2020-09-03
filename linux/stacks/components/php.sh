@@ -110,6 +110,8 @@ installPhp ()
     sed -i "s|;extension=mysqli|extension=mysqli|g" /etc/php/7.4/fpm/php.ini
     sed -i "s|;extension=openssl|extension=openssl|g" /etc/php/7.4/fpm/php.ini
     sed -i "s|;extension=pdo_mysql|extension=pdo_mysql|g" /etc/php/7.4/fpm/php.ini
+    sed -i "s|;extension=pdo_pgsql|extension=pdo_pgsql|g" /etc/php/7.4/fpm/php.ini
+    sed -i "s|;extension=soap|extension=soap|g" /etc/php/7.4/fpm/php.ini
     systemctl enable php7.4-fpm
     systemctl start php7.4-fpm
   elif [ "$DIST" = "centos" -o "$DIST" = "rhel" ]; then
