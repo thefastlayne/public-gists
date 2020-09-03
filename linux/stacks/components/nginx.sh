@@ -59,7 +59,7 @@ installNginx ()
         try_files $uri =404;
         include global/fastcgi_php.conf;
       }
-      include aliases/phpmyadmin.conf;
+      include aliases/*;
     }' > /etc/nginx/conf.d/default.conf
 
   # /etc/nginx/conf.d/default-ssl
@@ -105,7 +105,7 @@ installNginx ()
         try_files $uri =404;
         include global/fastcgi_php.conf;
       }
-      include aliases/phpmyadmin.conf;
+      include aliases/*;
     }' > /etc/nginx/conf.d/default-ssl
 
   # /etc/nginx/conf.d/proxy

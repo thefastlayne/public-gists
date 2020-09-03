@@ -6,7 +6,7 @@
 
 checkForUpdates ()
 {
-  echo -e "Upgrading newly installed packages...${NC}\n"
+  echo -e "${YELLOW}Upgrading newly installed packages...${NC}\n"
   if [ "$DIST" = "debian" -o "$DIST" = "ubuntu" ]; then
     apt-get upgrade -y
   elif [ "$DIST" = "centos" -o "$DIST" = "rhel" ]; then
@@ -16,7 +16,7 @@ checkForUpdates ()
 
 restartServices ()
 {
-  echo -e "Restarting all services...${NC}\n"
+  echo -e "${YELLOW}Restarting all services...${NC}\n"
   systemctl restart nginx
   nginx -s reload
   systemctl restart mariadb
@@ -36,7 +36,7 @@ main ()
     curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/php.sh" | bash -s -- --mariadb
     checkForUpdates
     restartServices
-    echo -e "Your LEMP stack is successfully installed and configured.\nYou can access your webserver at ${YELLOW}$(hostname -I)${NC}"
+    echo -e "${GREEN}Your LEMP stack is successfully installed and configured.${NC}\nYou can access your webserver at ${YELLOW}$(hostname -I)${NC}"
     exit 0
   else
     echo "ERROR: Please run again as root."

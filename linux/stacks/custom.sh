@@ -24,13 +24,13 @@ installCustom ()
   while read COMPONENT; do
     case $COMPONENT in
       "Nginx") curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/nginx.sh" | bash;;
-      "MariaDB") curl -s "" | bash;;
-      "PostgreSQL") curl -s "" | bash;;
+      "MariaDB") curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/mariadb.sh" | bash;;
+      "PostgreSQL") curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/postgresql.sh" | bash;;
       "SQLite") curl -s "" | bash;;
       "Microsoft SQL") curl -s "" | bash;;
       "MongoDB") curl -s "" | bash;;
       "Redis") curl -s "" | bash;;
-      "PHP") curl -s "" | bash;;
+      "PHP") curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/php.sh" | bash;;
       "Dotnet Core") curl -s "" | bash;;
       "Node") curl -s "" | bash;;
       "React") curl -s "" | bash;;
