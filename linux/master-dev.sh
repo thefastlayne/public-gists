@@ -58,7 +58,7 @@ restartServices ()
   SERVICES=(nginx mariadb postgresql postgresql-12 php7.4-fpm php-fpm)
   for service in "${SERVICES[@]}"; do
     if systemctl status "$service" "$QUIET"; then
-      systemctl restart "$service"
+      systemctl restart "$service" "$QUIET"
     fi
   done
 }
@@ -74,8 +74,10 @@ main ()
     source <(curl -s https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/__construct.sh)
     installPrerequisites
     installStack
-    checkForUpdates
-    restartServices
+    if installStack == 0; then
+      checkForUpdates
+      restartServices
+    fi
     exit 0
   else
     echo "ERROR: Please run again as root."
