@@ -54,6 +54,7 @@ installStack ()
       curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/custom.sh" | bash
       return 0
       ;;
+    *) return 1
   esac
 }
 
@@ -72,8 +73,8 @@ restartServices ()
   echo -e "${YELLOW}Restarting all services...${NC}\n"
   SERVICES=(nginx mariadb postgresql postgresql-12 php7.4-fpm php-fpm)
   for service in "${SERVICES[@]}"; do
-    if systemctl status "$service" "$QUIET"; then
-      systemctl restart "$service" "$QUIET"
+    if systemctl status "$service" > /dev/null 2>&1; then
+      systemctl restart "$service" > /dev/null 2>&1
     fi
   done
 }
