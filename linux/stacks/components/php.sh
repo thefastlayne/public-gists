@@ -150,6 +150,10 @@ main ()
       "--mariadb") installPhpmyadmin;;
       "--postgresql") installPhppgadmin;;
     esac
+    case "$2" in
+      "--mariadb") installPhpmyadmin;;
+      "--postgresql") installPhppgadmin;;
+    esac
   else
     echo "ERROR: Please run again as root."
     exit 1
