@@ -120,7 +120,7 @@ installPhp ()
       yum update -y
       yum install -y php php-bcmath php-bz2 php-cgi php-cli php-common php-curl php-fpm php-gd php-imagick php-imap php-intl php-json php-ldap php-mbstring php-mysql php-opcache php-pdo php-pear php-pgsql php-recode php-soap php-tidy php-xml php-xmlrpc php-zip
     elif [ $VER = 8 ]; then
-      dnf install -y http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+      dnf install -y http://rpms.remirepo.net/enterprise/remi-release-8.rpm
       dnf module reset php
       dnf module enable -y php:remi-7.4
       dnf install -y php php-bcmath php-bz2 php-cgi php-cli php-common php-curl php-fpm php-gd php-imagick php-imap php-intl php-json php-ldap php-mbstring php-mysql php-opcache php-pdo php-pear php-pgsql php-recode php-soap php-tidy php-xml php-xmlrpc php-zip
