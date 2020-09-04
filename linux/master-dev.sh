@@ -69,7 +69,7 @@ restartServices ()
       systemctl status "$service" | head -n 3
     fi
   done
-  if systemctl status nginx > /dev/null/ 2>&1; then
+  if systemctl status nginx > /dev/null 2>&1; then
     nginx -s reload
   fi
 }
