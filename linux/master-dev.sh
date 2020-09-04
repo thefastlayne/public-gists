@@ -33,28 +33,19 @@ installStack ()
       "Custom" "Select what components to install " off \
       3>&1 1>&2 2>&3 \
   )
+  stackInstalled=$?
+
   case $STACK in
     "LEMP")
-      curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/lemp.sh" | bash
-      return 0
-      ;;
+      curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/lemp.sh" | bash;;
     "LEPP")
-      curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/lepp.sh" | bash
-      return 0
-      ;;
+      curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/lepp.sh" | bash;;
     "LEPD")
-      curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/lepd.sh" | bash
-      return 0
-      ;;
+      curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/lepd.sh" | bash;;
     "LEMD")
-      curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/lemd.sh" | bash
-      return 0
-      ;;
+      curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/lemd.sh" | bash;;
     "Custom")
-      curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/custom.sh" | bash
-      return 0
-      ;;
-    *) return 1
+      curl -s "https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/custom.sh" | bash;;
   esac
 }
 
@@ -91,9 +82,11 @@ main ()
     source <(curl -s https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/__construct.sh)
     installPrerequisites
     installStack
-    if installStack == 0; then
+    if [ stackInstalled == 1 ]; then
       checkForUpdates
       restartServices
+    else
+      echo -e "${YELLOW}Stack Selection was cancelled...${NC}\n"
     fi
     exit 0
   else
