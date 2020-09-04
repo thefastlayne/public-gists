@@ -85,7 +85,7 @@ main ()
     source <(curl -s https://raw.githubusercontent.com/thefastlayne/public-gists/master/linux/stacks/components/__construct.sh)
     installPrerequisites
     installStack
-    if [ stackInstalled == 0 ]; then
+    if [ $stackInstalled == 0 ]; then
       checkForUpdates
       restartServices
     else
