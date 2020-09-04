@@ -66,7 +66,7 @@ restartServices ()
   for service in "${SERVICES[@]}"; do
     if systemctl status "$service" > /dev/null 2>&1; then
       systemctl restart "$service" > /dev/null 2>&1
-      systemctl status "$service" | head -n 3
+      systemctl status "$service" | head -n 5
     fi
   done
   if systemctl status nginx > /dev/null 2>&1; then
