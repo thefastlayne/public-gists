@@ -12,7 +12,6 @@ echo "Destination:  %destination%"
 echo.
 set /p "confirmLocation=Does the configuration shown above look correct? (y/n) "
 set task=ROBOCOPY "%source%" "%destination%" /COPYALL /S /MT:128 /R:3 /W:1 /LOG:"%source%\robocopy.log"
-echo %task%
 set true=echo Robocopy initiated. Please wait... & %task%
 set false=goto loop
 echo.
